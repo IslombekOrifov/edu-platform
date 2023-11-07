@@ -10,7 +10,7 @@ class SubjectAdmin(admin.ModelAdmin):
 
 
 class ModuleInline(admin.StackedInline):
-    mode = Module
+    model = Module
     
 
 @admin.register(Course)
