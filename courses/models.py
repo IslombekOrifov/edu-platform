@@ -1,6 +1,10 @@
 from django.db import models
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.fields import GenericForeignKey
 
 from accounts.models import CustomUser
+
+from .fields import OrderField
 
 
 class Subject(models.Model):
@@ -39,6 +43,59 @@ class Module(models.Model):
                                on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
+    order = OrderField(blank=True, for_fields=['course'])
     
+    class Meta:
+        ordering = ['order']
+
     def __str__(self):
-        return f"{self.title}"
+        return f"{self.order}. {self.title}"
+    
+
+class Content(models.Model):
+    module = models.ForeignKey(ContentType,
+                               related_name='contents',
+                               on_delete=models.CASCADE)
+    order = OrderField(blank=True, for_fields=['module'])
+    content_type = models.ForeignKey(ContentType,
+                                     on_delete=models.CASCADE,
+                                     limit_choices_to={'model__in':('text',
+                                                                    'video',
+                                                                    'image',
+                                                                    'file')})
+    object_id = models.PositiveIntegerField()
+    item = GenericForeignKey('content_type', 'object_id')
+    
+    class Meta:
+        ordering = ['order']
+    
+    
+class ItemBase(models.Model):
+    owner = models.ForeignKey(CustomUser,
+                              related_name='%(class)s_related',
+                              on_delete=models.CASCADE)
+    title = models.CharField(max_length=250)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        abstract = True
+        
+    def __str__(self):
+        return self.title
+    
+
+class Text(ItemBase):
+    content = models.TextField()
+    
+
+class File(ItemBase):
+    file = models.FileField(upload_to='files')
+    
+
+class Image(ItemBase):
+    file = models.ImageField(upload_to='files')
+    
+
+class Video(ItemBase):
+    url = models.URLField()
