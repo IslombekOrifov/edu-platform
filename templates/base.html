@@ -4,16 +4,17 @@
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}Education{% endblock %}</title>
-    <link rel="stylesheet" href="{% static 'css/base.html' %}">
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
 </head>
 <body>
-    <div class="header">
+    <div id="header">
         <a href="/" class="logo">Education</a>
         <ul class="menu">
             {% if request.user.is_authenticated %}
                 <li><a href="{% url 'logout' %}">Sign out</a></li>
             {% else %}
                 <li><a href="{% url 'login' %}">Sign in</a></li>
+            {% endif %}
         </ul>
     </div>
     <div id="content">
