@@ -53,7 +53,7 @@ class Module(models.Model):
     
 
 class Content(models.Model):
-    module = models.ForeignKey(ContentType,
+    module = models.ForeignKey(Module,
                                related_name='contents',
                                on_delete=models.CASCADE)
     order = OrderField(blank=True, for_fields=['module'])
